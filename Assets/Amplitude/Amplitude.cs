@@ -319,7 +319,40 @@ public class Amplitude {
 		}
 #endif
 	}
-	
+
+	/// <summary>
+	/// Tracks a bundle view
+	/// </summary>
+	/// <param name="bundle">a bundle</param>
+	public void bundleView(IDictionary<string, object> bundle) {
+		logEvent("bundleView", bundle);
+	}
+
+	/// <summary>
+	/// Tracks a Bundle Purchase
+	/// </summary>
+	/// <param name="bundle">a bundle</param>
+	public void bundlePurchase(IDictionary<string, object> bundle) {
+		logEvent("bundlePurchase", bundle);
+	}
+
+	/// <summary>
+	/// Tracks consumption of a bundle
+	/// </summary>
+	/// <param name="bundle">a bundle</param>
+	public void bundleConsume(IDictionary<string, object> bundle) {
+		logEvent("bundleConsume", bundle);
+	}
+
+	/// <summary>
+	/// Tracks the user progress level
+	/// </summary>
+	/// <param name="level">user progress level</param>
+	public void setUserProgressLevel(int level) {
+		logEvent("setUserProgressLevel", level);
+	}
+
+
 	/// <summary>
 	/// Tracks an event. Events are saved locally.
 	/// Uploads are batched to occur every 30 events or every 30 seconds (whichever comes first), as well as on app close.
@@ -448,8 +481,8 @@ public class Amplitude {
 
 	/// <summary>
 	/// Enables tracking opt out.
-	/// If the user wants to opt out of all tracking, use this method to enable opt out for them. 
-	/// Once opt out is enabled, no events will be saved locally or sent to the server. 
+	/// If the user wants to opt out of all tracking, use this method to enable opt out for them.
+	/// Once opt out is enabled, no events will be saved locally or sent to the server.
 	/// </summary>
 	/// <param name="enabled">enable opt out</param>
 	public void setOptOut(bool enabled) {
@@ -468,8 +501,8 @@ public class Amplitude {
 	}
 
 	/// <summary>
-	/// When a user closes and reopens the app within minTimeBetweenSessionsMillis milliseconds, 
-	/// the reopen is considered part of the same session and the session continues. 
+	/// When a user closes and reopens the app within minTimeBetweenSessionsMillis milliseconds,
+	/// the reopen is considered part of the same session and the session continues.
 	/// Otherwise, a new session is created. The default is 5 minutes.
 	/// </summary>
 	/// <param name="minTimeBetweenSessionsMillis">minimum time (milliseconds) between sessions</param>
@@ -487,10 +520,10 @@ public class Amplitude {
 		}
 #endif
 	}
-	
+
 	/// <summary>
 	/// If your app has its own system for tracking devices, you can set the deviceId.
-	/// 
+	///
 	/// NOTE: not recommended unless you know what you are doing.
 	/// </summary>
 	/// <param name="deviceId">device Id</param>
@@ -598,7 +631,7 @@ public class Amplitude {
 		}
 #endif
 	}
-	
+
 	public void logRevenue(string productId, int quantity, double price, string receipt, string receiptSignature) {
 		Log (string.Format("C# logRevenue {0}, {1}, {2} (with receipt)", productId, quantity, price));
 #if (UNITY_IPHONE || UNITY_TVOS)
@@ -613,7 +646,7 @@ public class Amplitude {
 		}
 #endif
 	}
-	
+
 	public void logRevenue(string productId, int quantity, double price, string receipt, string receiptSignature, string revenueType, IDictionary<string, object> eventProperties) {
 		string propertiesJson;
 		if (eventProperties != null) {
@@ -656,9 +689,9 @@ public class Amplitude {
 	}
 
 	/// <summary>
-	/// Regenerates a new random deviceId for current user. 
+	/// Regenerates a new random deviceId for current user.
 	/// Note: this is not recommended unless you know what you are doing. This can be used in conjunction with setUserId(null) to anonymize
-	/// users after they log out. 
+	/// users after they log out.
 	/// With a null userId and a completely new deviceId, the current user would appear as a brand new user in dashboard.
 	/// </summary>
 	public void regenerateDeviceId() {
@@ -676,13 +709,13 @@ public class Amplitude {
 	}
 
 	/// <summary>
-	/// iOS: 
+	/// iOS:
 	/// Use advertisingIdentifier instead of identifierForVendor as the device ID.
-	/// Apple prohibits the use of advertisingIdentifier if your app does not have advertising. 
-	/// 
+	/// Apple prohibits the use of advertisingIdentifier if your app does not have advertising.
+	///
 	/// Android:
 	/// Whether to use the Android advertising ID (ADID) as the user's device ID.
-	/// 
+	///
 	/// **NOTE:** Must be called before `initializeApiKey`.
 	/// </summary>
 	public void useAdvertisingIdForDeviceId() {
@@ -739,7 +772,7 @@ public class Amplitude {
 	}
 
 	/// <summary>
-	/// Manually forces the instance to immediately upload all unsent events. 
+	/// Manually forces the instance to immediately upload all unsent events.
 	/// Use this method to force the class to immediately upload all queued events.
 	/// </summary>
 	public void uploadEvents() {
