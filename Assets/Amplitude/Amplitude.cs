@@ -2,6 +2,7 @@ using AmplitudeNS.MiniJSON;
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using AssemblyCSharp.Assets.Amplitude;
 
 #if (UNITY_IPHONE || UNITY_TVOS)
 using System.Runtime.InteropServices;
@@ -324,24 +325,33 @@ public class Amplitude {
 	/// Tracks a bundle view
 	/// </summary>
 	/// <param name="bundle">a bundle</param>
-	public void bundleView(IDictionary<string, object> bundle) {
-		logEvent("bundleView", bundle);
+	public void bundleView(Bundle bundle) {
+		IDictionary<string, object> bundleProps = new Dictionary<string, object>();
+		bundleProps.Add("bundle", JsonUtility.ToJson(bundle));
+
+		logEvent("bundleView", bundleProps);
 	}
 
 	/// <summary>
 	/// Tracks a Bundle Purchase
 	/// </summary>
 	/// <param name="bundle">a bundle</param>
-	public void bundlePurchase(IDictionary<string, object> bundle) {
-		logEvent("bundlePurchase", bundle);
+	public void bundlePurchase(Bundle bundle) {
+		IDictionary<string, object> bundleProps = new Dictionary<string, object>();
+		bundleProps.Add("bundle", JsonUtility.ToJson(bundle));
+
+		logEvent("bundlePurchase", bundleProps);
 	}
 
 	/// <summary>
 	/// Tracks consumption of a bundle
 	/// </summary>
 	/// <param name="bundle">a bundle</param>
-	public void bundleConsume(IDictionary<string, object> bundle) {
-		logEvent("bundleConsume", bundle);
+	public void bundleConsume(Bundle bundle) {
+		IDictionary<string, object> bundleProps = new Dictionary<string, object>();
+		bundleProps.Add("bundle", JsonUtility.ToJson(bundle));
+
+		logEvent("bundleConsume", bundleProps);
 	}
 
 	/// <summary>
@@ -349,7 +359,9 @@ public class Amplitude {
 	/// </summary>
 	/// <param name="level">user progress level</param>
 	public void setUserProgressLevel(int level) {
-		logEvent("setUserProgressLevel", level);
+		IDictionary<string, object> progressLevel = new Dictionary<string, object>();
+		progressLevel.Add("progressLevel", level);
+		logEvent("setUserProgressLevel", progressLevel);
 	}
 
 

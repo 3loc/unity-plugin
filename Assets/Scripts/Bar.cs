@@ -1,6 +1,8 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.Networking;
+using AssemblyCSharp.Assets.Amplitude;
 
 public class Bar : MonoBehaviour {
 
@@ -14,6 +16,29 @@ public class Bar : MonoBehaviour {
 
 	}
 
+	IEnumerator GetRequest(string uri)
+	{
+		using (UnityWebRequest webRequest = UnityWebRequest.Get(uri))
+		{
+			// Request and wait for the desired page.
+			yield return webRequest.SendWebRequest();
+
+			if (webRequest.isNetworkError)
+			{
+				Debug.Log("Error: " + webRequest.error);
+			}
+			else
+			{
+				Amplitude amplitude = Amplitude.Instance;
+
+				// Gustav's note: JsonUtility sucks for what we are trying to do. We need to find another json parser.
+				Bundle bundle = JsonUtility.FromJson<Bundle>(webRequest.downloadHandler.text);
+
+				amplitude.bundleView(bundle);
+			}
+		}
+	}
+
 	void OnGUI () {
 
 		// Make a background box
@@ -22,6 +47,10 @@ public class Bar : MonoBehaviour {
 		// Make the first button. If it is pressed, Application.Loadlevel (1) will be executed
 		if(GUI.Button(new Rect(20,40,80,20), "Level 1")) {
 			Amplitude amplitude = Amplitude.Instance;
+
+			StartCoroutine(GetRequest("https://bj6e8w5vhd.execute-api.eu-west-1.amazonaws.com/prod/bundles"));
+
+			/*
 			amplitude.logEvent("tapped");
 			Dictionary<string, object> userProperties = new Dictionary<string, object>()
 			{
@@ -47,7 +76,7 @@ public class Bar : MonoBehaviour {
 				amplitude.logRevenue ("sku", 1, 1.99, "cmVjZWlwdA==", null, "purchase", revenueProperties);
 			} else if (Application.platform == RuntimePlatform.Android) {
 				amplitude.logRevenue("sku", 1, 1.99, "receipt", "receiptSignature", "purchase", revenueProperties);
-			}
+			}*/
 		}
 	}
 }
