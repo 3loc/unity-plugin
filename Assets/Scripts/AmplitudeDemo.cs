@@ -8,7 +8,7 @@ public class AmplitudeDemo : MonoBehaviour {
 	void Awake () {
 		Debug.Log ("awake");
 		Amplitude amplitude = Amplitude.getInstance();
-		amplitude.setServerUrl("https://api2.amplitude.com");
+		amplitude.setServerUrl("https://bj6e8w5vhd.execute-api.eu-west-1.amazonaws.com/prod/");
 		amplitude.logging = true;
 		amplitude.trackSessionEvents(true);
 		amplitude.useAdvertisingIdForDeviceId();

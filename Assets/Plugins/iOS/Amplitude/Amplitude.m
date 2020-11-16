@@ -998,7 +998,7 @@ static NSString *const SEQUENCE_NUMBER = @"sequence_number";
     [postData appendData:[checksum dataUsingEncoding:NSUTF8StringEncoding]];
 
     [request setHTTPMethod:@"POST"];
-    [request setValue:@"application/x-www-form-urlencoded" forHTTPHeaderField:@"Content-Type"];
+    [request setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
     [request setValue:[NSString stringWithFormat:@"%lu", (unsigned long)[postData length]] forHTTPHeaderField:@"Content-Length"];
 
     if (_token != nil) {
