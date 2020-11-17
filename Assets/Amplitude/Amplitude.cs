@@ -386,13 +386,13 @@ public class Amplitude {
 		var bundleJson = Json.Serialize(dict);
 
 		return bundleJson;
-}
+	}
 
-/// <summary>
-/// Deserializes a bundle from a JSON string
-/// </summary>
-/// <param name="bundle">a bundle</param>
-public Bundle deserializeBundle(string json)
+	/// <summary>
+	/// Deserializes a bundle from a JSON string
+	/// </summary>
+	/// <param name="bundle">a bundle</param>
+	public Bundle deserializeBundle(string json)
 	{
 		var dict = Json.Deserialize(json) as Dictionary<string, object>;
 		Bundle bundle = new Bundle();
