@@ -327,7 +327,10 @@ public class Amplitude {
 	/// <param name="bundle">a bundle</param>
 	public void bundleView(Bundle bundle) {
 		IDictionary<string, object> bundleProps = new Dictionary<string, object>();
-		bundleProps.Add("bundle", JsonUtility.ToJson(bundle));
+		// Gustav's note: JsonUtility sucks for what we are trying to do. We need to find another json parser.
+
+		bundleProps.Add("bundle", serializeBundle(bundle));
+		Debug.Log(bundleProps["bundle"]);
 
 		logEvent("bundleView", bundleProps);
 	}
@@ -338,7 +341,7 @@ public class Amplitude {
 	/// <param name="bundle">a bundle</param>
 	public void bundlePurchase(Bundle bundle) {
 		IDictionary<string, object> bundleProps = new Dictionary<string, object>();
-		bundleProps.Add("bundle", JsonUtility.ToJson(bundle));
+		bundleProps.Add("bundle", serializeBundle(bundle));
 
 		logEvent("bundlePurchase", bundleProps);
 	}
@@ -349,7 +352,7 @@ public class Amplitude {
 	/// <param name="bundle">a bundle</param>
 	public void bundleConsume(Bundle bundle) {
 		IDictionary<string, object> bundleProps = new Dictionary<string, object>();
-		bundleProps.Add("bundle", JsonUtility.ToJson(bundle));
+		bundleProps.Add("bundle", serializeBundle(bundle));
 
 		logEvent("bundleConsume", bundleProps);
 	}
@@ -364,6 +367,42 @@ public class Amplitude {
 		logEvent("setUserProgressLevel", progressLevel);
 	}
 
+	/// <summary>
+    /// Serializes a bundle to a JSON string
+    /// </summary>
+    /// <param name="bundle">a bundle</param>
+    public string serializeBundle(Bundle bundle)
+    {
+		Dictionary<string, object> dict = new Dictionary<string, object>();
+		dict.Add("bundle_id", bundle.bundle_id);
+		dict.Add("price", bundle.price);
+		dict.Add("currency", bundle.currency);
+		dict.Add("payment_type", bundle.payment_type);
+		dict.Add("display_price", bundle.display_price);
+		dict.Add("data", bundle.data);
+		var bundleJson = Json.Serialize(dict);
+
+		return bundleJson;
+}
+
+/// <summary>
+/// Deserializes a bundle from a JSON string
+/// </summary>
+/// <param name="bundle">a bundle</param>
+public Bundle deserializeBundle(string json)
+	{
+		var dict = Json.Deserialize(json) as Dictionary<string, object>;
+		Bundle bundle = new Bundle();
+
+		bundle.bundle_id = (string) dict["bundle_id"];
+		bundle.price = new decimal((float) dict["price"]);
+		bundle.currency = (string) dict["currency"];
+		bundle.payment_type = (string) dict["payment_type"];
+		bundle.display_price = (string) dict["display_price"];
+		bundle.data = Json.Serialize(dict["data"]);
+
+		return bundle;
+	}
 
 	/// <summary>
 	/// Tracks an event. Events are saved locally.

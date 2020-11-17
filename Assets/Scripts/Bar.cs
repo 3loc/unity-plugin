@@ -31,8 +31,10 @@ public class Bar : MonoBehaviour {
 			{
 				Amplitude amplitude = Amplitude.Instance;
 
-				// Gustav's note: JsonUtility sucks for what we are trying to do. We need to find another json parser.
-				Bundle bundle = JsonUtility.FromJson<Bundle>(webRequest.downloadHandler.text);
+
+				//webRequest.downloadHandler.text
+
+				Bundle bundle = amplitude.deserializeBundle(webRequest.downloadHandler.text);
 
 				amplitude.bundleView(bundle);
 			}
