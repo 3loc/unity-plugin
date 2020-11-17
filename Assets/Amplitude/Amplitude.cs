@@ -327,10 +327,8 @@ public class Amplitude {
 	/// <param name="bundle">a bundle</param>
 	public void bundleView(Bundle bundle) {
 		IDictionary<string, object> bundleProps = new Dictionary<string, object>();
-		// Gustav's note: JsonUtility sucks for what we are trying to do. We need to find another json parser.
 
-		bundleProps.Add("bundle", serializeBundle(bundle));
-		Debug.Log(bundleProps["bundle"]);
+		bundleProps.Add("bundle", serializeBundle(bundle))
 
 		logEvent("bundleView", bundleProps);
 	}
