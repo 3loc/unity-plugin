@@ -328,7 +328,8 @@ public class Amplitude {
 	public void bundleView(Bundle bundle) {
 		IDictionary<string, object> bundleProps = new Dictionary<string, object>();
 
-		bundleProps.Add("bundle", serializeBundle(bundle))
+		bundleProps.Add("bundle", serializeBundle(bundle));
+		bundleProps.Add("timestamp", System.DateTime.UtcNow.ToString());
 
 		logEvent("bundleView", bundleProps);
 	}
@@ -340,6 +341,7 @@ public class Amplitude {
 	public void bundlePurchase(Bundle bundle) {
 		IDictionary<string, object> bundleProps = new Dictionary<string, object>();
 		bundleProps.Add("bundle", serializeBundle(bundle));
+		bundleProps.Add("timestamp", System.DateTime.UtcNow.ToString());
 
 		logEvent("bundlePurchase", bundleProps);
 	}
@@ -351,6 +353,7 @@ public class Amplitude {
 	public void bundleConsume(Bundle bundle) {
 		IDictionary<string, object> bundleProps = new Dictionary<string, object>();
 		bundleProps.Add("bundle", serializeBundle(bundle));
+		bundleProps.Add("timestamp", System.DateTime.UtcNow.ToString());
 
 		logEvent("bundleConsume", bundleProps);
 	}
@@ -362,6 +365,8 @@ public class Amplitude {
 	public void setUserProgressLevel(int level) {
 		IDictionary<string, object> progressLevel = new Dictionary<string, object>();
 		progressLevel.Add("progressLevel", level);
+		progressLevel.Add("timestamp", System.DateTime.UtcNow.ToString());
+
 		logEvent("setUserProgressLevel", progressLevel);
 	}
 
