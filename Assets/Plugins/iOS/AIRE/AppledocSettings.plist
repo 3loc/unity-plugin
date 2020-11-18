@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+    "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>--ignore</key>
+    <array>
+        <string>AIRE.m</string>
+        <string>AIREARCMacros.h</string>
+        <string>AIREConstants.h</string>
+        <string>AIREConstants.m</string>
+        <string>AIREDatabaseHelper.h</string>
+        <string>AIREDatabaseHelper.m</string>
+        <string>AIREDeviceInfo.h</string>
+        <string>AIREDeviceInfo.m</string>
+        <string>AIRELocationManagerDelegate.h</string>
+        <string>AIRELocationManagerDelegate.m</string>
+        <string>AIREURLConnection.h</string>
+        <string>AIREURLConnection.m</string>
+        <string>AIREUtils.h</string>
+        <string>AIREUtils.m</string>
+        <string>SSLCertificatePinning</string>
+    </array>
+    <key>--output</key>
+    <string>./documentation/</string>
+    <key>--project-company</key>
+    <string>AIRE</string>
+    <key>--project-name</key>
+    <string>AIRE-iOS</string>
+    <key>--company-id</key>
+    <string>com.aire</string>
+    <key>--create-docset</key>
+    <false/>
+    <key>--create-html</key>
+    <true/>
+    <key>--install-docset</key>
+    <false/>
+    <key>--verbose</key>
+    <string>4</string>
+    <key>--logformat</key>
+    <integer>1</integer>
+</dict>
+</plist>
