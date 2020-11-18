@@ -332,6 +332,7 @@ public class Amplitude {
 		bundleProps.Add("timestamp", System.DateTime.UtcNow.ToString());
 
 		logEvent("bundleView", bundleProps);
+		uploadEvents();
 	}
 
 	/// <summary>
@@ -344,6 +345,7 @@ public class Amplitude {
 		bundleProps.Add("timestamp", System.DateTime.UtcNow.ToString());
 
 		logEvent("bundlePurchase", bundleProps);
+		uploadEvents();
 	}
 
 	/// <summary>
@@ -363,11 +365,7 @@ public class Amplitude {
 	/// </summary>
 	/// <param name="level">user progress level</param>
 	public void setUserProgressLevel(int level) {
-		IDictionary<string, object> progressLevel = new Dictionary<string, object>();
-		progressLevel.Add("progressLevel", level);
-		progressLevel.Add("timestamp", System.DateTime.UtcNow.ToString());
-
-		logEvent("setUserProgressLevel", progressLevel);
+		setUserProperty("progressLevel", level);
 	}
 
 	/// <summary>
