@@ -3,6 +3,7 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using AssemblyCSharp.Assets.Amplitude;
+using UnityEngine.Networking;
 
 #if (UNITY_IPHONE || UNITY_TVOS)
 using System.Runtime.InteropServices;
@@ -221,6 +222,9 @@ public class Amplitude {
 
 		this.setLibraryName(UnityLibraryName);
 		this.setLibraryVersion(UnityLibraryVersion);
+
+		this.trackSessionEvents(true);
+		this.useAdvertisingIdForDeviceId();
 	}
 
 	protected void Log(string message) {
@@ -306,7 +310,7 @@ public class Amplitude {
 	/// Uploads are batched to occur every 30 events or every 30 seconds (whichever comes first), as well as on app close.
 	/// </summary>
 	/// <param name="evt">event type</param>
-	public void logEvent(string evt) {
+	private void logEvent(string evt) {
 		Log (string.Format("C# sendEvent {0}", evt));
 #if (UNITY_IPHONE || UNITY_TVOS)
 		if (Application.platform == RuntimePlatform.IPhonePlayer || Application.platform == RuntimePlatform.tvOS) {
@@ -321,31 +325,120 @@ public class Amplitude {
 #endif
 	}
 
+
+
 	/// <summary>
-	/// Tracks a bundle view
+	/// Get a recommended bundle
+	/// Usage: StartCoroutine(amplitude.GetRecommendedBundle(bundle => doSomething(bundle)));
+	/// </summary>
+	/// <param name="onDataAction">A delegate that is called when the Bundle is fetched</param>
+	public IEnumerator GetRecommendedBundle(System.Action<Bundle> onDataAction)
+	{
+		using (UnityWebRequest webRequest = UnityWebRequest.Get("https://bj6e8w5vhd.execute-api.eu-west-1.amazonaws.com/prod/bundles"))
+		{
+			// Request and wait for the desired page.
+			yield return webRequest.SendWebRequest();
+
+			if (webRequest.isNetworkError)
+			{
+				Debug.Log("Error getting recommended bundle: " + webRequest.error);
+			}
+			else
+			{
+				Bundle bundle = deserializeBundle(webRequest.downloadHandler.text);
+				onDataAction(bundle);
+			}
+		}
+	}
+
+	/// <summary>
+	/// Tracks a bundle view open
 	/// </summary>
 	/// <param name="bundle">a bundle</param>
-	public void bundleView(Bundle bundle) {
+	public void bundleViewOpen(Bundle bundle) {
+		bundle.view_event = new Bundle.BundleViewEvent();
+
 		IDictionary<string, object> bundleProps = new Dictionary<string, object>();
-
 		bundleProps.Add("bundle", serializeBundle(bundle));
-		bundleProps.Add("timestamp", System.DateTime.UtcNow.ToString());
 
-		logEvent("bundleView", bundleProps);
+		logEvent("bundle.view.open", bundleProps);
 		uploadEvents();
 	}
 
 	/// <summary>
-	/// Tracks a Bundle Purchase
+	/// Tracks a bundle view close
 	/// </summary>
 	/// <param name="bundle">a bundle</param>
-	public void bundlePurchase(Bundle bundle) {
+	public void bundleViewClose(Bundle bundle)
+	{
+		if(bundle.view_event != null)
+        {
+			bundle.view_event.duration = System.DateTime.UtcNow.Ticks - bundle.view_event.start_time;
+			IDictionary<string, object> bundleProps = new Dictionary<string, object>();
+			bundleProps.Add("bundle", serializeBundle(bundle));
+
+			logEvent("bundle.view.close", bundleProps);
+			uploadEvents();
+			bundle.view_event = null;
+        }
+	}
+	
+	/// <summary>
+	/// Tracks the beginning of a Bundle Purchase
+	/// </summary>
+	/// <param name="bundle">a bundle</param>
+	public void bundlePurchaseBegin(Bundle bundle)
+	{
+		bundle.purchase_event = new Bundle.BundlePurchaseEvent();	
+
 		IDictionary<string, object> bundleProps = new Dictionary<string, object>();
 		bundleProps.Add("bundle", serializeBundle(bundle));
-		bundleProps.Add("timestamp", System.DateTime.UtcNow.ToString());
 
-		logEvent("bundlePurchase", bundleProps);
+		logEvent("bundle.purchase.begin", bundleProps);
 		uploadEvents();
+	}
+
+	/// <summary>
+	/// Tracks an aborted Bundle Purchase
+	/// </summary>
+	/// <param name="bundle">a bundle</param>
+	public void bundlePurchaseAborted(Bundle bundle)
+	{
+		if (bundle.purchase_event != null)
+		{
+			bundle.purchase_event.duration = System.DateTime.UtcNow.Ticks - bundle.purchase_event.start_time;
+
+			IDictionary<string, object> bundleProps = new Dictionary<string, object>();
+			bundleProps.Add("bundle", serializeBundle(bundle));
+
+			logEvent("bundle.purchase.aborted", bundleProps);
+			uploadEvents();
+		}
+
+		bundle.purchase_event = null;
+	}
+
+	/// <summary>
+	/// Tracks an aborted Bundle Purchase
+	/// </summary>
+	/// <param name="bundle">a bundle</param>
+	/// <param name="receipt">a receipt string</param>
+	public void bundlePurchaseCompleted(Bundle bundle, string receipt) {
+		// event_group_id (same as bundle view)
+
+		if (bundle.purchase_event != null)
+		{
+			bundle.purchase_event.duration = System.DateTime.UtcNow.Ticks - bundle.purchase_event.start_time;
+
+			IDictionary<string, object> bundleProps = new Dictionary<string, object>();
+			bundleProps.Add("bundle", serializeBundle(bundle));
+			bundleProps.Add("receipt", receipt);
+
+			logEvent("bundle.purchase.completed", bundleProps);
+			uploadEvents();
+		}
+
+		bundle.purchase_event = null;
 	}
 
 	/// <summary>
@@ -355,7 +448,6 @@ public class Amplitude {
 	public void bundleConsume(Bundle bundle) {
 		IDictionary<string, object> bundleProps = new Dictionary<string, object>();
 		bundleProps.Add("bundle", serializeBundle(bundle));
-		bundleProps.Add("timestamp", System.DateTime.UtcNow.ToString());
 
 		logEvent("bundleConsume", bundleProps);
 	}
@@ -381,6 +473,19 @@ public class Amplitude {
 		dict.Add("payment_type", bundle.payment_type);
 		dict.Add("display_price", bundle.display_price);
 		dict.Add("data", bundle.data);
+
+		if(bundle.view_event != null)
+        {
+			dict.Add("bundle_view_start_time", bundle.view_event.start_time);
+			dict.Add("bundle_view_duration", bundle.view_event.duration);
+		}
+
+		if (bundle.purchase_event != null)
+		{
+			dict.Add("bundle_purchase_start_time", bundle.purchase_event.start_time);
+			dict.Add("bundle_purchase_duration", bundle.purchase_event.duration);
+		}
+
 		var bundleJson = Json.Serialize(dict);
 
 		return bundleJson;
@@ -411,7 +516,7 @@ public class Amplitude {
 	/// </summary>
 	/// <param name="evt">event type</param>
 	/// <param name="properties">event properties</param>
-	public void logEvent(string evt, IDictionary<string, object> properties) {
+	private void logEvent(string evt, IDictionary<string, object> properties) {
 		string propertiesJson;
 		if (properties != null) {
 			propertiesJson = Json.Serialize(properties);
@@ -440,7 +545,7 @@ public class Amplitude {
 	/// <param name="evt">event type</param>
 	/// <param name="properties">event properties</param>
 	/// <param name="outOfSession">if this event belongs to current session</param>
-	public void logEvent(string evt, IDictionary<string, object> properties, bool outOfSession) {
+	private void logEvent(string evt, IDictionary<string, object> properties, bool outOfSession) {
 		string propertiesJson;
 		if (properties != null) {
 			propertiesJson = Json.Serialize(properties);
@@ -827,7 +932,7 @@ public class Amplitude {
 	/// Manually forces the instance to immediately upload all unsent events.
 	/// Use this method to force the class to immediately upload all queued events.
 	/// </summary>
-	public void uploadEvents() {
+	private void uploadEvents() {
 #if (UNITY_IPHONE || UNITY_TVOS)
 		if (Application.platform == RuntimePlatform.IPhonePlayer || Application.platform == RuntimePlatform.tvOS) {
 			_Amplitude_uploadEvents(instanceName);
