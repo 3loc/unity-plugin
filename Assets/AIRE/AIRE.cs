@@ -355,10 +355,11 @@ public class AIRE {
 	/// </summary>
 	/// <param name="bundle">a bundle</param>
 	public void bundleViewOpen(Bundle bundle) {
-		bundle.view_event = new Bundle.BundleViewEvent();
+		bundle.view_event = new Bundle.BundleViewEvent(bundle.bundle_id);
 
 		IDictionary<string, object> bundleProps = new Dictionary<string, object>();
 		bundleProps.Add("bundle", serializeBundle(bundle));
+		bundleProps.Add("event_group_id", bundle.view_event.event_group_id);
 
 		logEvent("bundle.view.open", bundleProps);
 		uploadEvents();
@@ -372,9 +373,11 @@ public class AIRE {
 	{
 		if(bundle.view_event != null)
         {
-			bundle.view_event.duration = System.DateTime.UtcNow.Ticks - bundle.view_event.start_time;
+			bundle.view_event.duration = (System.DateTime.UtcNow.Ticks / System.TimeSpan.TicksPerMillisecond) - bundle.view_event.start_time;
 			IDictionary<string, object> bundleProps = new Dictionary<string, object>();
 			bundleProps.Add("bundle", serializeBundle(bundle));
+			bundleProps.Add("duration", bundle.view_event.duration);
+			bundleProps.Add("event_group_id", bundle.view_event.event_group_id);
 
 			logEvent("bundle.view.close", bundleProps);
 			uploadEvents();
@@ -388,10 +391,11 @@ public class AIRE {
 	/// <param name="bundle">a bundle</param>
 	public void bundlePurchaseBegin(Bundle bundle)
 	{
-		bundle.purchase_event = new Bundle.BundlePurchaseEvent();	
+		bundle.purchase_event = new Bundle.BundlePurchaseEvent(bundle.bundle_id);	
 
 		IDictionary<string, object> bundleProps = new Dictionary<string, object>();
 		bundleProps.Add("bundle", serializeBundle(bundle));
+		bundleProps.Add("event_group_id", bundle.purchase_event.event_group_id);
 
 		logEvent("bundle.purchase.begin", bundleProps);
 		uploadEvents();
@@ -405,10 +409,12 @@ public class AIRE {
 	{
 		if (bundle.purchase_event != null)
 		{
-			bundle.purchase_event.duration = System.DateTime.UtcNow.Ticks - bundle.purchase_event.start_time;
+			bundle.purchase_event.duration = (System.DateTime.UtcNow.Ticks / System.TimeSpan.TicksPerMillisecond) - bundle.purchase_event.start_time;
 
 			IDictionary<string, object> bundleProps = new Dictionary<string, object>();
 			bundleProps.Add("bundle", serializeBundle(bundle));
+			bundleProps.Add("duration", bundle.purchase_event.duration);
+			bundleProps.Add("event_group_id", bundle.purchase_event.event_group_id);
 
 			logEvent("bundle.purchase.aborted", bundleProps);
 			uploadEvents();
@@ -427,11 +433,13 @@ public class AIRE {
 
 		if (bundle.purchase_event != null)
 		{
-			bundle.purchase_event.duration = System.DateTime.UtcNow.Ticks - bundle.purchase_event.start_time;
+			bundle.purchase_event.duration = (System.DateTime.UtcNow.Ticks / System.TimeSpan.TicksPerMillisecond) - bundle.purchase_event.start_time;
 
 			IDictionary<string, object> bundleProps = new Dictionary<string, object>();
 			bundleProps.Add("bundle", serializeBundle(bundle));
 			bundleProps.Add("receipt", receipt);
+			bundleProps.Add("duration", bundle.purchase_event.duration);
+			bundleProps.Add("event_group_id", bundle.purchase_event.event_group_id);
 
 			logEvent("bundle.purchase.completed", bundleProps);
 			uploadEvents();
