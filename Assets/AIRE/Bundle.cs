@@ -10,11 +10,13 @@ namespace AssemblyCSharp.Assets.AIRE
         {
             public long duration;
             public long start_time;
+            public string event_group_id;
 
-            public BundleViewEvent()
+            public BundleViewEvent(string bundleId)
             {
                 duration = 0;
-                start_time = System.DateTime.UtcNow.Ticks;
+                start_time = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+                event_group_id = start_time.ToString() + ":" + bundleId;
             }
         }
 
@@ -22,11 +24,13 @@ namespace AssemblyCSharp.Assets.AIRE
         {
             public long duration;
             public long start_time;
+            public string event_group_id;
 
-            public BundlePurchaseEvent()
+            public BundlePurchaseEvent(string bundleId)
             {
                 duration = 0;
-                start_time = System.DateTime.UtcNow.Ticks;
+                start_time = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+                event_group_id = start_time.ToString() + ":" + bundleId;
             }
         }
 
